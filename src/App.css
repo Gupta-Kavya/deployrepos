@@ -1,38 +1,71 @@
+@import url('https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
 .App {
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+* {
+  margin: 0px;
+  padding: 0px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+body {
+  background-color: #fdfdfdb3;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.deploy-main-card{
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 2px 10px;
+}
+
+body h2 {
+font-family: sans-serif;
+}
+
+.container {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.bck-img {
+  flex: 1;
+  max-width: 70%;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.left-side {
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  height: 100vh; /* Full page height */
+}
+
+.left-side .logo {
+  width: 35rem;
+  margin: auto;
+  vertical-align: middle;
+  position: relative;
+  transform: translate(0px, 40vh);
+}
+
+.login-form {
+  max-width: 30%;
+  margin: auto;
+}
+
+p{
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Hide the scrollbar track */
+::-webkit-scrollbar {
+  width: 5px; /* Width of the scrollbar */
+}
+
+/* Style the scrollbar thumb */
+::-webkit-scrollbar-thumb {
+  background-color: #888; /* Color of the scrollbar thumb */
+  border-radius: 10px; /* Rounded corners for the thumb */
+}
+
+/* Style the scrollbar track on hover */
+::-webkit-scrollbar-thumb:hover {
+  background-color: #555; /* Color of the scrollbar thumb on hover */
 }
