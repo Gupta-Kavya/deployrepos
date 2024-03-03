@@ -1,6 +1,9 @@
 import React, { useEffect, useState, useRef } from "react";
 import { io } from "socket.io-client";
 import { toast, Bounce } from "react-toastify";
+import DOMPurify from "dompurify";
+import { useWindowSize } from "@uidotdev/usehooks";
+import Confetti from "react-confetti";
 
 const ImportProject = () => {
   const [gitUrl, setGitUrl] = useState("");
@@ -15,6 +18,7 @@ const ImportProject = () => {
   const [processsection, setProcesssection] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [logsmodal, setLogsmodal] = useState(false);
+  const [buildlogsbtn, setBuildlogsbtn] = useState(false);
   const buildLogsRef = useRef(null);
 
   useEffect(() => {
@@ -28,8 +32,11 @@ const ImportProject = () => {
     scrollToBottom();
 
     const searchParams = new URLSearchParams(window.location.search);
-    const gitUrl = searchParams.get("gitUrl");
-    const projectName = searchParams.get("projectName");
+    const gitUrl = DOMPurify.sanitize(searchParams.get("gitUrl"));
+
+    const splittedUrl = gitUrl.split("/");
+    const gitProjectName = splittedUrl[splittedUrl.length - 1];
+    const projectName = gitProjectName.split(".")[0];
 
     if (gitUrl && projectName) {
       setGitUrl(gitUrl);
@@ -49,68 +56,36 @@ const ImportProject = () => {
     const socket = io(`${process.env.REACT_APP_BACKEND_URI}`);
 
     socket.on("connect", () => {
-      console.log("Socket connected");
+      // console.log("Socket connected");
     });
 
     socket.on("status-update", (message) => {
-      console.log("Received message:", message);
+      // console.log("Received message:", message);
 
       if (message === "Added To Que") {
         setAddtoqueLoader(false);
-
-        window.addEventListener("beforeunload", function (e) {
-          // Cancel the event
-          e.preventDefault();
-          // Chrome requires returnValue to be set
-          e.returnValue = "";
-          // Display a warning message
-          return "Are you sure you want to reload this page? All unsaved changes will be lost.";
-        });
       }
 
       if (message === "Project Build Started") {
         setProjectBuildLoader(true);
-
-        window.addEventListener("beforeunload", function (e) {
-          // Cancel the event
-          e.preventDefault();
-          // Chrome requires returnValue to be set
-          e.returnValue = "";
-          // Display a warning message
-          return "Are you sure you want to reload this page? All unsaved changes will be lost.";
-        });
+        setBuildlogsbtn(true);
 
         // setLogsmodal(true)
       }
 
       if (message === "Build Completed") {
         setProjectBuildLoader(false);
-
-        window.addEventListener("beforeunload", function (e) {
-          // Cancel the event
-          e.preventDefault();
-          // Chrome requires returnValue to be set
-          e.returnValue = "";
-          // Display a warning message
-          return "Are you sure you want to reload this page? All unsaved changes will be lost.";
-        });
+        setBuildlogsbtn(true);
       }
 
       if (message === "Deployment Started") {
         setDeploymentLoader(true);
-
-        window.addEventListener("beforeunload", function (e) {
-          // Cancel the event
-          e.preventDefault();
-          // Chrome requires returnValue to be set
-          e.returnValue = "";
-          // Display a warning message
-          return "Are you sure you want to reload this page? All unsaved changes will be lost.";
-        });
+        setBuildlogsbtn(true);
       }
 
       if (message === "Deployment Successfull") {
         setDeploymentLoader(false);
+        setBuildlogsbtn(true);
 
         setTimeout(() => {
           setProcesssection(false);
@@ -121,9 +96,11 @@ const ImportProject = () => {
     });
 
     socket.on("error", (message) => {
-      console.log("Received message:", message);
+      // console.log("Received message:", message);
 
-      setProcesssection(false);
+      // setProcesssection(false);
+      setProjectBuildLoader(undefined);
+      setBuildlogsbtn(true);
     });
 
     socket.on("build-log", (message) => {
@@ -170,14 +147,17 @@ const ImportProject = () => {
         const requestBody = JSON.stringify(gitUrlObject); // Stringify the object
 
         // Now use requestBody in the fetch request body
-        let res = await fetch(`${process.env.REACT_APP_BACKEND_URI}/cloneProject`, {
-          mode: "cors",
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: requestBody, // Use the JSON string as the request body
-        });
+        let res = await fetch(
+          `${process.env.REACT_APP_BACKEND_URI}/cloneProject`,
+          {
+            mode: "cors",
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: requestBody, // Use the JSON string as the request body
+          }
+        );
 
         if (!res.ok) {
           throw new Error("Failed to fetch");
@@ -185,7 +165,7 @@ const ImportProject = () => {
 
         let resJson = await res.json(); // Corrected to call the json() method
         localStorage.setItem("buildId", resJson.id);
-        console.log(resJson);
+        // console.log(resJson);
         setIsDeploying(false);
       } catch (error) {
         console.error("Error:", error);
@@ -203,9 +183,9 @@ const ImportProject = () => {
 
   const copyToClipboard = () => {
     const textField = document.createElement("textarea");
-    textField.innerText = `http://${localStorage.getItem(
-      "buildId"
-    )}.${process.env.REACT_APP_SERVE_URI}/`;
+    textField.innerText = `http://${localStorage.getItem("buildId")}.${
+      process.env.REACT_APP_SERVE_URI
+    }/`;
     document.body.appendChild(textField);
     textField.select();
     document.execCommand("copy");
@@ -224,13 +204,14 @@ const ImportProject = () => {
     });
   };
 
+  const { width, height } = useWindowSize();
+
   return (
     <div>
+      {isOpen && <Confetti width={width} height={height} />}
+
       <div className="p-4 sm:ml-64">
-        <div
-          href=""
-          className="block p-6 bg-white border rounded-lg deploy-main-card"
-        >
+        <div className="block p-6 bg-white border rounded-lg deploy-main-card">
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -336,7 +317,7 @@ const ImportProject = () => {
         </div>
 
         {processsection && (
-          <>
+          <div className="block p-6 bg-white border rounded-lg deploy-main-card mt-3">
             <div className="p-3 bg-white border border-gray-200 rounded-lg shadow  dark:bg-gray-800 dark:border-gray-700 mt-3 w-full flex justify-between items-center">
               <p className="text-sm font-semibold">Project Added To Que</p>
 
@@ -488,9 +469,9 @@ const ImportProject = () => {
                           >
                             <path
                               stroke="currentColor"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
                               d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
                             />
                           </svg>
@@ -525,7 +506,7 @@ const ImportProject = () => {
 
             {/* button foe seeing build logs */}
 
-            {projectbuildloader && (
+            {buildlogsbtn && (
               <button
                 type="button"
                 className="text-white bg-gradient-to-br from-black to-gray-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mt-3"
@@ -598,7 +579,7 @@ const ImportProject = () => {
                 </button>
               </div>
             </div>
-          </>
+          </div>
         )}
 
         {isOpen && (
@@ -610,7 +591,9 @@ const ImportProject = () => {
               <div className="relative bg-white rounded-lg shadow dark:bg-gray-800">
                 <div className="flex items-center justify-between p-4 md:p-5">
                   <h3 className="text-lg text-gray-500 dark:text-gray-400">
-                    Congrats!! Project has been deployed successfully.
+                    <strong>
+                      Congrats!! Project has been deployed successfully.
+                    </strong>
                   </h3>
                   <button
                     type="button"
@@ -627,9 +610,9 @@ const ImportProject = () => {
                     >
                       <path
                         stroke="currentColor"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
                         d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
                       />
                     </svg>
@@ -683,9 +666,9 @@ const ImportProject = () => {
                         >
                           <path
                             stroke="currentColor"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
                             d="M1 5.917 5.724 10.5 15 1.5"
                           />
                         </svg>

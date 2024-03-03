@@ -70,7 +70,7 @@ try {
   app.get("/auth/github", (req, res) => {
     // Redirect the user to GitHub for authentication
     res.redirect(
-      `${process.env.GITHUB_REDIRECT_LOGIN_URI}`
+      `https://github.com/login/oauth/authorize?response_type=code&redirect_uri=${process.env.GITHUB_CALLBACK_URL}&client_id=715267c8871b4c835b64`
     );
   });
 

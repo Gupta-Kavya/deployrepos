@@ -1,25 +1,24 @@
 import React from "react";
-import { Link, useRoutes } from "react-router-dom";
+import { Link, useRoutes, useLocation } from "react-router-dom";
 import Home from "../pages/Home";
 import ImportProject from "../pages/Imp";
 import History from "../pages/History";
 
 const Sidebar = () => {
+  const location = useLocation();
+
   let element = useRoutes([
     {
       path: "/",
       element: <Home />,
-    
     },
     {
       path: "/import",
       element: <ImportProject />,
-    
     },
     {
       path: "/past-deployments",
       element: <History />,
-    
     },
   ]);
 
@@ -56,7 +55,12 @@ const Sidebar = () => {
         <div className="h-full px-3 py-4 overflow-y-auto bg-gray-100 dark:bg-gray-200 rounded-r-lg">
           <ul className="space-y-2 font-medium">
             <li>
-              <Link to="/" className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white dark:hover:bg-gray-700 group bg-white">
+              <Link
+                to="/"
+                className={`flex items-center p-2 text-gray-900 rounded-lg dark:text-white dark:hover:bg-gray-700 group ${
+                  location.pathname === "/" || location.pathname === "/import" ? "bg-white" : ""
+                }`}
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
@@ -68,7 +72,12 @@ const Sidebar = () => {
               </Link>
             </li>
             <li>
-              <Link to="/past-deployments" className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white dark:hover:bg-gray-700 group">
+              <Link
+                to="/past-deployments"
+                className={`flex items-center p-2 text-gray-900 rounded-lg dark:text-white dark:hover:bg-gray-700 group ${
+                  location.pathname === "/past-deployments" ? "bg-white" : ""
+                }`}
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 512 512"

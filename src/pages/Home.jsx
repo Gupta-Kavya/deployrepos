@@ -3,14 +3,14 @@ import { Link } from "react-router-dom";
 const Home = () => {
   const [repos, setRepos] = useState({ repoNames: [], htmlUrls: [] });
   const [gitUrl, setgitUrl] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     const accessToken = localStorage.getItem("accessToken");
     fetchRepositories(accessToken)
       .then((repositories) => {
-        // console.log(repositories);
-        const repoNames = repositories.map((repo) => repo.name); // Extracting names from repositories
-        const htmlUrls = repositories.map((repo) => repo.html_url); // Extracting URLs from repositories
+        const repoNames = repositories.map((repo) => repo.name);
+        const htmlUrls = repositories.map((repo) => repo.html_url);
         setRepos({ repoNames, htmlUrls });
       })
       .catch((error) => {
@@ -38,6 +38,13 @@ const Home = () => {
     }
   }
 
+  const handleGitUrlSubmit = () => {
+    window.location = `${process.env.REACT_APP_FRONTEND_URI}/import?gitUrl=${gitUrl}`;
+  };
+
+  const filteredRepos = repos.repoNames.filter((repo) =>
+    repo.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className="p-4 sm:ml-64 flex-auto justify-evenly flex">
@@ -65,7 +72,7 @@ const Home = () => {
                 type="text"
                 id="input-group-1"
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                placeholder="gupta-Kavya"
+                placeholder={`${localStorage.getItem("userName")}`}
                 disabled={true}
               />
             </div>
@@ -86,13 +93,15 @@ const Home = () => {
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-gray-300 focus:border-gray-300 block w-full ps-10 p-2.5  dark:bg-gray-300 dark:border-gray-300 dark:placeholder-gray-400 dark:text-white dark:focus:ring-gray-300 dark:focus:border-gray-300 focus:outline-none"
                 placeholder="Search..."
                 disabled={false}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
           </div>
         </form>
 
-        {repos &&
-          repos.repoNames.map((repo, index) => {
+        {filteredRepos &&
+          filteredRepos.map((repo, index) => {
             return (
               <div
                 key={index}
@@ -116,9 +125,7 @@ const Home = () => {
                     sendRequestFoRBuild(repos.htmlUrls[index]);
                   }} */}
 
-                <Link
-                  to={`/import?gitUrl=${repos.htmlUrls[index]}&projectName=${repo}`}
-                >
+                <Link to={`/import?gitUrl=${repos.htmlUrls[index]}`}>
                   <button
                     type="button"
                     className="text-white bg-black hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700"
@@ -129,6 +136,14 @@ const Home = () => {
               </div>
             );
           })}
+
+        <div
+          className="p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400"
+          role="alert"
+        >
+          <span className="font-medium">Info : </span> Only Github Public
+          Repositories are shown Here.
+        </div>
       </div>
 
       <div className="m-auto text-sm font-semibold">OR</div>
@@ -141,7 +156,12 @@ const Home = () => {
           Import Git Repository by URL
         </h3>
 
-        <form>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleGitUrlSubmit();
+          }}
+        >
           <div className="relative">
             <div className="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
               <svg
@@ -156,10 +176,11 @@ const Home = () => {
               type="text"
               id="search"
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-gray-300 focus:border-gray-300 block w-full ps-10 p-2.5  dark:bg-gray-300 dark:border-gray-300 dark:placeholder-gray-400 dark:text-white dark:focus:ring-gray-300 dark:focus:border-gray-300 focus:outline-none"
-              placeholder="https://some-provider.com/some-organization/some-project"
+              placeholder="https://github.com/user-name/repository-name"
               disabled={false}
               value={gitUrl}
               onChange={(e) => setgitUrl(e.target.value)}
+              required
             />
           </div>
 

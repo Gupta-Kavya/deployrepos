@@ -1,5 +1,6 @@
 const simpleGit = require("simple-git");
 const uploadDirectoryToS3 = require("./filepaths");
+const addDomain = require("./domain");
 const { exec } = require("child_process");
 const fs = require("fs").promises;
 const Redis = require("ioredis");
@@ -131,6 +132,7 @@ async function processQueue(io) {
               await io.emit("status-update", "Deployment Started");
 
               await uploadDirectoryToS3(buildPath, job.id);
+              await addDomain(job.id);
 
               // Emit message indicating files uploaded
               await io.emit("status-update", "Deployment Successfull");

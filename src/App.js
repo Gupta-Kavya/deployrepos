@@ -16,7 +16,6 @@ function App() {
     const userName = searchParams.get("userName");
     const jwtToken = searchParams.get("jwtToken");
 
-    const decodedToken = jwtDecode(localStorage.getItem("token"));
 
     // Update state with the access token
     if (accessTokenParam && userName && jwtToken) {
@@ -28,6 +27,7 @@ function App() {
       localStorage.getItem("userName") &&
       localStorage.getItem("token")
     ) {
+      const decodedToken = jwtDecode(localStorage.getItem("token"));
       if (decodedToken.accessToken === localStorage.getItem("accessToken") && decodedToken.userName === localStorage.getItem("userName")) {
       } else {
         window.location = `${process.env.REACT_APP_FRONTEND_URI}/login`;
@@ -41,7 +41,7 @@ function App() {
     const socket = io(`${process.env.REACT_APP_BACKEND_URI}`);
 
     socket.on("connect", () => {
-      console.log("Socket connected");
+      // console.log("Socket connected");
     });
 
     // socket.on("status-update", (message) => {
@@ -61,7 +61,7 @@ function App() {
     // });
 
     socket.on("error", (message) => {
-      console.log("Received message:", message);
+      // console.log("Received message:", message);
 
       toast.error(`${message}`, {
         position: "bottom-center",

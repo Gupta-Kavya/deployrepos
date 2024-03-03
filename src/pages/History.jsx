@@ -3,7 +3,6 @@ import { toast, Bounce } from "react-toastify";
 
 const FetchHistory = () => {
   const [data, setData] = useState([]);
-  const [loader, setLoader] = useState(false);
   const [loadingMap, setLoadingMap] = useState({});
 
   const userId = "Gupta-Kavya"; // Replace with your actual user ID
@@ -61,7 +60,17 @@ const FetchHistory = () => {
           transition: Bounce,
         });
       } else {
-        console.log("Some internal error occured.");
+        toast.error("Internal Error Occured", {
+          position: "bottom-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+          transition: Bounce,
+        });
       }
     } catch (error) {
       console.error("Error deleting folder:", error);
@@ -135,7 +144,7 @@ const FetchHistory = () => {
                 <div className="flex flex-col">
                   <p className="text-sm text-gray-600">
                     <span className="font-semibold">Build ID:</span>{" "}
-                    {item.buildId}
+                    <kbd>{item.buildId}</kbd>
                   </p>
                   <p className="text-sm text-gray-600">
                     <span className="font-semibold">Git URL:</span>{" "}
@@ -201,7 +210,7 @@ const FetchHistory = () => {
                   type="button"
                   className="w-1/2 bg-black text-white font-semibold py-2 px-4 rounded-lg hover:bg-gray-700 transition duration-200 ml-2 flex items-center justify-center"
                   onClick={() => {
-                    window.location = `http://${item.buildId}.${process.env.REACT_APP_SERVE_URI}/`;
+                    window.location = `http://${item.buildId}.${process.env.REACT_APP_SERVE_URI}/index.html`;
                   }}
                 >
                   <svg
