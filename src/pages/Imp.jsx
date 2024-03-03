@@ -22,6 +22,26 @@ const ImportProject = () => {
   const buildLogsRef = useRef(null);
 
   useEffect(() => {
+    const socket = io(`${process.env.REACT_APP_BACKEND_URI}`, {
+      // Pass the existing socket ID if available
+      query: localStorage.getItem("socketId"),
+    });
+
+    socket.on("connect", () => {
+      console.log("Socket connected");
+      // Ensure the socket has an ID assigned
+      if (!socket.id) {
+        console.error("Socket ID is missing");
+        return;
+      }
+      console.log("Socket ID is " + socket.id);
+
+      // Store the socket ID in localStorage if it's not present
+      if (!localStorage.getItem("socketId")) {
+        localStorage.setItem("socketId", socket.id);
+      }
+    });
+
     const scrollToBottom = () => {
       if (buildLogsRef.current) {
         buildLogsRef.current.scrollTop = buildLogsRef.current.scrollHeight;
@@ -53,14 +73,8 @@ const ImportProject = () => {
       window.location = `${process.env.REACT_APP_FRONTEND_URI}`;
     }
 
-    const socket = io(`${process.env.REACT_APP_BACKEND_URI}`);
-
-    socket.on("connect", () => {
-      // console.log("Socket connected");
-    });
-
     socket.on("status-update", (message) => {
-      // console.log("Received message:", message);
+      console.log("Received message:", message);
 
       if (message === "Added To Que") {
         setAddtoqueLoader(false);
@@ -86,6 +100,9 @@ const ImportProject = () => {
       if (message === "Deployment Successfull") {
         setDeploymentLoader(false);
         setBuildlogsbtn(true);
+        socket.disconnect();
+        localStorage.removeItem("socketId");
+
 
         setTimeout(() => {
           setProcesssection(false);
@@ -96,7 +113,22 @@ const ImportProject = () => {
     });
 
     socket.on("error", (message) => {
-      // console.log("Received message:", message);
+      console.log("Received message:", message);
+
+        // console.log("Received message:", message);
+  
+        toast.error(`${message}`, {
+          position: "bottom-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+          transition: Bounce,
+        });
+  
 
       // setProcesssection(false);
       setProjectBuildLoader(undefined);
@@ -111,9 +143,9 @@ const ImportProject = () => {
       appendLogMessage({ text: message, type: "error" });
     });
 
-    return () => {
-      socket.disconnect();
-    };
+    // return () => {
+    //   socket.disconnect();
+    // };
   }, [logMessages]);
 
   const appendLogMessage = (message) => {
@@ -136,6 +168,7 @@ const ImportProject = () => {
       setAddtoqueLoader(true);
       setProcesssection(true);
       try {
+        const socketId = localStorage.getItem("socketId"); // Get the socket ID from local storage
         const gitUrlObject = {
           gitUrl: gitUrl,
           rootPath: rootPath,
@@ -143,10 +176,10 @@ const ImportProject = () => {
           userName: localStorage.getItem("userName"),
           accessToken: localStorage.getItem("accessToken"),
           projectName: projectname,
-        }; // Convert the string to an object
-        const requestBody = JSON.stringify(gitUrlObject); // Stringify the object
+          socketId: socketId, // Pass the socket ID to the backend
+        };
+        const requestBody = JSON.stringify(gitUrlObject);
 
-        // Now use requestBody in the fetch request body
         let res = await fetch(
           `${process.env.REACT_APP_BACKEND_URI}/cloneProject`,
           {
@@ -155,7 +188,7 @@ const ImportProject = () => {
             headers: {
               "Content-Type": "application/json",
             },
-            body: requestBody, // Use the JSON string as the request body
+            body: requestBody,
           }
         );
 
@@ -163,9 +196,8 @@ const ImportProject = () => {
           throw new Error("Failed to fetch");
         }
 
-        let resJson = await res.json(); // Corrected to call the json() method
+        let resJson = await res.json();
         localStorage.setItem("buildId", resJson.id);
-        // console.log(resJson);
         setIsDeploying(false);
       } catch (error) {
         console.error("Error:", error);
@@ -634,7 +666,7 @@ const ImportProject = () => {
                       className="col-span-6 bg-gray-50 border border-gray-300 text-gray-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
                       value={`http://${localStorage.getItem(
                         "buildId"
-                      )}.localhost:3003/`}
+                      )}.${process.env.REACT_APP_SERVE_URI}/`}
                       disabled
                       readOnly
                     />

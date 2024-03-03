@@ -47,12 +47,12 @@ const Home = () => {
   );
 
   return (
-    <div className="p-4 sm:ml-64 flex-auto justify-evenly flex">
-      {/* <h2 className="text-4xl mb-6">Let's get you Deployed.</h2> */}
+<div className="p-4 sm:ml-64 flex-auto justify-evenly flex flex-col sm:flex-row ">
+        {/* <h2 className="text-4xl mb-6">Let's get you Deployed.</h2> */}
 
       <div
         href=""
-        className="block p-6 bg-white border rounded-lg deploy-main-card"
+        className="block p-6 bg-white border rounded-lg deploy-main-card mb-3 sm:mb-0"
       >
         <h3 className="text-2xl font-semibold mb-6">Import Git Repository</h3>
 
@@ -150,7 +150,7 @@ const Home = () => {
 
       <div
         href=""
-        className="block p-6 bg-white border rounded-lg deploy-main-card w-1/2"
+        className="block p-6 bg-white border rounded-lg deploy-main-card w-full sm:w-1/2 mt-3 sm:mt-0"
       >
         <h3 className="text-2xl font-semibold mb-6">
           Import Git Repository by URL

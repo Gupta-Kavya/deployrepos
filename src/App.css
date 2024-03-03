@@ -50,6 +50,44 @@ font-family: sans-serif;
   margin: auto;
 }
 
+
+@media (max-width: 767px) {
+  
+  .container {
+    flex-direction: column;
+  }
+  .bck-img{
+    max-width: 100%;
+  }
+
+  .left-side{
+border-bottom-left-radius: 10px;
+border-bottom-right-radius: 10px;
+box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+  }
+
+
+  .left-side .logo {
+    width: 50rem;
+    margin: auto;
+    vertical-align: middle;
+    position: relative;
+    transform: translate(0px, 0vh);
+    padding: 60px;
+    
+  }
+
+  .login-form {
+    max-width: 100%;
+    margin: auto;
+  }
+
+
+}
+
+
+
+
 p{
   font-family: Arial, Helvetica, sans-serif;
 }

@@ -16,7 +16,6 @@ function App() {
     const userName = searchParams.get("userName");
     const jwtToken = searchParams.get("jwtToken");
 
-
     // Update state with the access token
     if (accessTokenParam && userName && jwtToken) {
       localStorage.setItem("accessToken", accessTokenParam);
@@ -28,7 +27,10 @@ function App() {
       localStorage.getItem("token")
     ) {
       const decodedToken = jwtDecode(localStorage.getItem("token"));
-      if (decodedToken.accessToken === localStorage.getItem("accessToken") && decodedToken.userName === localStorage.getItem("userName")) {
+      if (
+        decodedToken.accessToken === localStorage.getItem("accessToken") &&
+        decodedToken.userName === localStorage.getItem("userName")
+      ) {
       } else {
         window.location = `${process.env.REACT_APP_FRONTEND_URI}/login`;
       }
@@ -36,49 +38,10 @@ function App() {
       window.location = `${process.env.REACT_APP_FRONTEND_URI}/login`;
     }
 
-    // window.location = "http://localhost:3000/login";
 
-    const socket = io(`${process.env.REACT_APP_BACKEND_URI}`);
-
-    socket.on("connect", () => {
-      // console.log("Socket connected");
-    });
-
-    // socket.on("status-update", (message) => {
-    //   console.log("Received message:", message);
-
-    //   toast.success(message, {
-    //     position: "top-center",
-    //     autoClose: 5000,
-    //     hideProgressBar: false,
-    //     closeOnClick: true,
-    //     pauseOnHover: true,
-    //     draggable: true,
-    //     progress: undefined,
-    //     theme: "dark",
-    //     transition: Bounce,
-    //   });
-    // });
-
-    socket.on("error", (message) => {
-      // console.log("Received message:", message);
-
-      toast.error(`${message}`, {
-        position: "bottom-center",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "dark",
-        transition: Bounce,
-      });
-    });
-
-    return () => {
-      socket.disconnect();
-    };
+    // return () => {
+    //   socket.disconnect();
+    // };
   }, []);
 
   return (

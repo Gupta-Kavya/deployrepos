@@ -62,9 +62,11 @@ app.post("/cloneProject", async (req, res) => {
       userName: req.body.userName,
       accessToken: req.body.accessToken,
       projectName: req.body.projectName,
+      socketId:req.body.socketId
     };
 
     setTimeout(() => {
+      console.log(job.socketId)
       addToQueue(job);
 
       res.status(200).json({
@@ -72,7 +74,7 @@ app.post("/cloneProject", async (req, res) => {
         id: id,
         message: "Build request added to queue.",
       });
-      io.emit("status-update", "Added To Que");
+      io.to(job.socketId).emit("status-update", "Added To Que");
     }, 2000);
   } catch (error) {
     console.log(error);
@@ -80,7 +82,7 @@ app.post("/cloneProject", async (req, res) => {
       success: false,
       message: "Error adding build request to queue.",
     });
-    io.emit("error", "Some Internal error occured");
+    console.log("Some Internal error occured");
   }
 });
 

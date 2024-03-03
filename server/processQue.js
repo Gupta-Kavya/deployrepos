@@ -34,15 +34,20 @@ async function deleteDirectory(directoryPath) {
 
 // exec command
 
-async function executeCommand(command, io) {
+async function executeCommand(command, io, socketId) {
   return new Promise((resolve, reject) => {
-    const childProcess = exec(command);
+    // Ensure that the socket ID is passed to the child process
+    const childProcess = exec(command, { env: { SOCKET_ID: socketId } });
+
+    // Emit build log and error messages to the specified socket
     childProcess.stdout.on("data", (data) => {
-      io.emit("build-log", data.toString()); // Emit build log to frontend
+      io.to(socketId).emit("build-log", data.toString());
     });
     childProcess.stderr.on("data", (data) => {
-      io.emit("build-error", data.toString()); // Emit error log to frontend
+      io.to(socketId).emit("build-error", data.toString());
     });
+
+    // Handle the close event of the child process
     childProcess.on("close", (code) => {
       if (code === 0) {
         resolve(); // Resolve when command execution completes successfully
@@ -52,6 +57,7 @@ async function executeCommand(command, io) {
     });
   });
 }
+
 
 async function checkIfGitRepoIsEmpty(directoryPath) {
   try {
@@ -79,13 +85,15 @@ async function processQueue(io) {
     });
 
     if (job) {
+      const socketId = job.socketId; // Store the socket ID associated with this job
+
       try {
         // Check if a build with the same projectName already exists in the database
         const existingBuild = await buildSchema.findOne({
           projectName: job.projectName,
         });
         if (existingBuild) {
-          io.emit("error", "Only 1 build per project is allowed");
+          io.to(socketId).emit("error", "Only 1 build per project is allowed");
           console.log("A build with the same project name already exists.");
           continue; // Skip further processing for this job
         }
@@ -94,31 +102,33 @@ async function processQueue(io) {
         await simpleGit().clone(job.gitUrl, job.id + "/");
 
         // Emit message indicating repository is cloned
-        io.emit("status-update", "Repo Cloned Successfully");
+        io.to(socketId).emit("status-update", "Repo Cloned Successfully");
 
         // Check if the repository is empty
         if ((await checkIfGitRepoIsEmpty(job.id + "/")) === 0) {
           console.log("Repo is empty");
-          io.emit("error", "Repository is empty");
+          io.to(socketId).emit("error", "Repository is empty");
 
           // Remove the directory
           await fs.rm(job.id + "/", { recursive: true });
         } else {
           // Build the project
-          io.emit("status-update", "Project Build Started");
+          io.to(socketId).emit("status-update", "Project Build Started");
           try {
             // Execute npm install
             await executeCommand(
               `cd ${job.id}/${job.rootDir}/ && npm install`,
-              io
+              io,
+              socketId
             );
 
             // Execute npm run build
             await executeCommand(
               `cd ${job.id}/${job.rootDir}/ && npm run build`,
-              io
+              io,
+              socketId
             );
-            io.emit("status-update", "Build Completed");
+            io.to(socketId).emit("status-update", "Build Completed");
 
             // Check if the build directory exists before uploading to S3
             const buildPath = `${job.id}/${job.rootDir}/build`;
@@ -129,13 +139,13 @@ async function processQueue(io) {
 
             if (buildExists) {
               // Upload to S3 only if npm install and npm build succeed and build directory exists
-              await io.emit("status-update", "Deployment Started");
+              await io.to(socketId).emit("status-update", "Deployment Started");
 
               await uploadDirectoryToS3(buildPath, job.id);
-              await addDomain(job.id);
+              // await addDomain(job.id);
 
               // Emit message indicating files uploaded
-              await io.emit("status-update", "Deployment Successfull");
+              await io.to(socketId).emit("status-update", "Deployment Successfull");
 
               const newBuild = new buildSchema({
                 username: job.userName,
@@ -151,11 +161,11 @@ async function processQueue(io) {
               // Delete the directory after successful upload
               await deleteDirectory(`${job.id}/`);
             } else {
-              io.emit("error", "Invalid Root Directory");
+              io.to(socketId).emit("error", "Invalid Root Directory");
               console.error("Invalid Root Directory");
             }
           } catch (error) {
-            io.emit("error", "An error occurred during build");
+            io.to(socketId).emit("error", "An error occurred during build");
             console.error(`Error executing command: ${error.message}`);
           }
         }
@@ -165,10 +175,10 @@ async function processQueue(io) {
           (error.message.includes("Repository not found") ||
             error.message.includes("does not exist"))
         ) {
-          io.emit("error", "Invalid Repository URL");
+          io.to(socketId).emit("error", "Invalid Repository URL");
           console.log("Repository not found");
         } else {
-          io.emit("error", "An error occurred during processing");
+          io.to(socketId).emit("error", "An error occurred during processing");
           console.error("Error processing job:", error);
         }
       }
@@ -178,5 +188,6 @@ async function processQueue(io) {
     }
   }
 }
+
 
 module.exports = processQueue;
