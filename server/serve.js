@@ -24,11 +24,6 @@ app.use(async (req, res, next) => {
   const folderName = hostArr[0];
 
   try {
-    // Check if the requested URL is the root path
-    if (req.url === "/") {
-      // Redirect to http://r3bnnf.localhost:3003/index.html
-      return res.redirect(`${folderName}.localhost:3003/index.html`);
-    }
 
     // Replace backslashes with forward slashes in the folderName
     const cleanFolderName = folderName.replace(/\\/g, "/");

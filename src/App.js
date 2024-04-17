@@ -1,11 +1,9 @@
 import "./App.css";
 import Sidebar from "./components/Sidebar";
 import { useEffect } from "react";
-import { ToastContainer, toast, Bounce } from "react-toastify";
+import { ToastContainer} from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { jwtDecode } from "jwt-decode";
-
-import { io } from "socket.io-client";
 
 function App() {
   useEffect(() => {
@@ -38,10 +36,6 @@ function App() {
       window.location = `${process.env.REACT_APP_FRONTEND_URI}/login`;
     }
 
-
-    // return () => {
-    //   socket.disconnect();
-    // };
   }, []);
 
   return (

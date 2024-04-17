@@ -28,18 +28,17 @@ const ImportProject = () => {
     });
 
     socket.on("connect", () => {
-      console.log("Socket connected");
+      // console.log("Socket connected");
       // Ensure the socket has an ID assigned
       if (!socket.id) {
         console.error("Socket ID is missing");
         return;
       }
-      console.log("Socket ID is " + socket.id);
+      // console.log("Socket ID is " + socket.id);
 
       // Store the socket ID in localStorage if it's not present
-      if (!localStorage.getItem("socketId")) {
-        localStorage.setItem("socketId", socket.id);
-      }
+
+      localStorage.setItem("socketId", socket.id);
     });
 
     const scrollToBottom = () => {
@@ -74,7 +73,7 @@ const ImportProject = () => {
     }
 
     socket.on("status-update", (message) => {
-      console.log("Received message:", message);
+      // console.log("Received message:", message);
 
       if (message === "Added To Que") {
         setAddtoqueLoader(false);
@@ -103,7 +102,6 @@ const ImportProject = () => {
         socket.disconnect();
         localStorage.removeItem("socketId");
 
-
         setTimeout(() => {
           setProcesssection(false);
           setLogsmodal(false);
@@ -113,22 +111,22 @@ const ImportProject = () => {
     });
 
     socket.on("error", (message) => {
-      console.log("Received message:", message);
+      // console.log("Received message:", message);
+      localStorage.removeItem("socketId");
 
-        // console.log("Received message:", message);
-  
-        toast.error(`${message}`, {
-          position: "bottom-center",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-          transition: Bounce,
-        });
-  
+      // console.log("Received message:", message);
+
+      toast.error(`${message}`, {
+        position: "bottom-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        transition: Bounce,
+      });
 
       // setProcesssection(false);
       setProjectBuildLoader(undefined);
@@ -287,6 +285,9 @@ const ImportProject = () => {
                   Select Framework
                 </option>
                 <option value="react">React</option>
+                <option value="vite">Vite</option>
+                {/* <option value="angular">Angular</option> */}
+                <option value="vuejs">Vue.js</option>
                 {/* Add more options as needed */}
               </select>
             </div>
@@ -664,9 +665,9 @@ const ImportProject = () => {
                       id="course-url"
                       type="text"
                       className="col-span-6 bg-gray-50 border border-gray-300 text-gray-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                      value={`http://${localStorage.getItem(
-                        "buildId"
-                      )}.${process.env.REACT_APP_SERVE_URI}/`}
+                      value={`http://${localStorage.getItem("buildId")}.${
+                        process.env.REACT_APP_SERVE_URI
+                      }/`}
                       disabled
                       readOnly
                     />

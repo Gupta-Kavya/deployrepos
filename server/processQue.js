@@ -8,15 +8,13 @@ const REDIS_PORT = 6379; // Redis default port
 const redisClient = Redis.createClient(REDIS_PORT);
 const mongoose = require("mongoose");
 const buildSchema = require("./schemas/builds");
-require('dotenv').config();
+require("dotenv").config();
 
 main().catch((err) => console.log(err));
 
 async function main() {
   try {
-    await mongoose.connect(
-      `${process.env.MONGO_URI}`
-    );
+    await mongoose.connect(`${process.env.MONGO_URI}`);
     console.log("Connection to Mongodb is success");
   } catch (error) {
     console.log(error);
@@ -34,10 +32,10 @@ async function deleteDirectory(directoryPath) {
 
 // exec command
 
-async function executeCommand(command, io, socketId) {
+async function executeCommand(command, io, socketId , buildId) {
   return new Promise((resolve, reject) => {
     // Ensure that the socket ID is passed to the child process
-    const childProcess = exec(command, { env: { SOCKET_ID: socketId } });
+    const childProcess = exec(command);
 
     // Emit build log and error messages to the specified socket
     childProcess.stdout.on("data", (data) => {
@@ -53,11 +51,11 @@ async function executeCommand(command, io, socketId) {
         resolve(); // Resolve when command execution completes successfully
       } else {
         reject(new Error(`Command '${command}' exited with code ${code}`)); // Reject with error if command fails
+        deleteDirectory(`${buildId}/`);
       }
     });
   });
 }
-
 
 async function checkIfGitRepoIsEmpty(directoryPath) {
   try {
@@ -110,7 +108,7 @@ async function processQueue(io) {
           io.to(socketId).emit("error", "Repository is empty");
 
           // Remove the directory
-          await fs.rm(job.id + "/", { recursive: true });
+          await deleteDirectory(`${job.id}/`);
         } else {
           // Build the project
           io.to(socketId).emit("status-update", "Project Build Started");
@@ -119,19 +117,40 @@ async function processQueue(io) {
             await executeCommand(
               `cd ${job.id}/${job.rootDir}/ && npm install`,
               io,
-              socketId
+              socketId,
+              job.id
             );
 
             // Execute npm run build
             await executeCommand(
               `cd ${job.id}/${job.rootDir}/ && npm run build`,
               io,
-              socketId
+              socketId,
+              job.id
             );
             io.to(socketId).emit("status-update", "Build Completed");
 
             // Check if the build directory exists before uploading to S3
-            const buildPath = `${job.id}/${job.rootDir}/build`;
+
+            // buuild directory accordig to framework
+            let buildDir = "";
+            if (job.frameWork === "react") {
+              buildDir = "build";
+            }
+            if (job.frameWork === "vite") {
+              buildDir = "dist";
+            }
+
+            if (job.frameWork === "angular") {
+              buildDir = "dist";
+            }
+
+            if (job.frameWork === "vuejs") {
+              buildDir = "dist";
+            }
+
+            const buildPath = `${job.id}/${job.rootDir}/${buildDir}`;
+
             const buildExists = await fs
               .access(buildPath)
               .then(() => true)
@@ -141,11 +160,15 @@ async function processQueue(io) {
               // Upload to S3 only if npm install and npm build succeed and build directory exists
               await io.to(socketId).emit("status-update", "Deployment Started");
 
+              await console.log(fs.readFile(`${job.id}/package.json`))
+
               await uploadDirectoryToS3(buildPath, job.id);
-              // await addDomain(job.id);
+              await addDomain(job.id);
 
               // Emit message indicating files uploaded
-              await io.to(socketId).emit("status-update", "Deployment Successfull");
+              await io
+                .to(socketId)
+                .emit("status-update", "Deployment Successfull");
 
               const newBuild = new buildSchema({
                 username: job.userName,
@@ -163,10 +186,12 @@ async function processQueue(io) {
             } else {
               io.to(socketId).emit("error", "Invalid Root Directory");
               console.error("Invalid Root Directory");
+              await deleteDirectory(`${job.id}/`);
             }
           } catch (error) {
             io.to(socketId).emit("error", "An error occurred during build");
             console.error(`Error executing command: ${error.message}`);
+            await deleteDirectory(`${job.id}/`);
           }
         }
       } catch (error) {
@@ -180,6 +205,7 @@ async function processQueue(io) {
         } else {
           io.to(socketId).emit("error", "An error occurred during processing");
           console.error("Error processing job:", error);
+          await deleteDirectory(`${job.id}/`);
         }
       }
     } else {
@@ -188,6 +214,5 @@ async function processQueue(io) {
     }
   }
 }
-
 
 module.exports = processQueue;
