@@ -52,4 +52,4 @@ DeployRepos.com is licensed under the MIT License. See the [LICENSE](LICENSE) fi
 
 ## Contact
 
-If you have any questions or need support, please contact us at [kavyaguptajpr.24.10@gmail.com](mailto:kavyaguptajpr.24.10@gmail.com).
+If you have any questions or need support, please contact me at [kavyaguptajpr.24.10@gmail.com](mailto:kavyaguptajpr.24.10@gmail.com).
