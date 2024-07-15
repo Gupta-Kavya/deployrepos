@@ -24,12 +24,12 @@ const io = require("socket.io")(server, {
 main().catch((err) => console.log(err));
 
 const s3Client = new S3Client({
-  endpoint: "https://blr1.digitaloceanspaces.com", // Corrected endpoint URL
+  endpoint: `${process.env.DIGITALOCEAN_ENDPOINT}`, // Corrected endpoint URL
   forcePathStyle: false,
-  region: "blr1",
+  region: `${process.env.DIGITALOCEAN_REGION}`,
   credentials: {
-    accessKeyId: "DO002RQBGLUFKJE6K2H7",
-    secretAccessKey: "DlR7RY7MxMREkp3Vj9yAdGYfHK3oxZ+0P9KCfb3/lgg",
+    accessKeyId: `${process.env.DIGITALOCEAN_ACCESSKEY_ID}`,
+    secretAccessKey: `${process.env.DIGITALOCEAN_SECRET_ACCESS_KEY}`,
   },
 });
 
