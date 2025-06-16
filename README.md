@@ -1,55 +1,79 @@
-# DeployRepos.com
+# 🚀 DeployRepos
 
-DeployRepos.com is a powerful tool that allows you to deploy any GitHub repository with just a single click. It provides live build logs and uploads the deployment to GitHub, making the process seamless and efficient.
+**DeployRepos** is a powerful tool that allows you to deploy any GitHub repository with just a single click. It provides live build logs and uploads the deployment to GitHub, making the process seamless and efficient.
 
-## Features
+---
 
-- **One-Click Deployment**: Deploy your GitHub repository with a single click.
-- **Live Build Logs**: Monitor the build process in real-time with live build logs.
-- **GitHub Integration**: Automatically fetch your public repositories to your dashboard.
-- **Easy to Use**: User-friendly interface for hassle-free deployments.
-- **Fast and Efficient**: Quick deployment process to save time and effort.
+## 🌟 Features
 
-## Getting Started
+- 🔘 **One-Click Deployment** – Deploy any public GitHub repo with a single click.
+- 📺 **Live Build Logs** – Watch your project build in real-time.
+- 🔗 **GitHub Integration** – Fetch your repositories and display them in your dashboard.
+- ⚡ **Fast and Efficient** – Quick build & deploy pipeline.
+- 💻 **User-Friendly Interface** – Clean and modern UI for easy navigation.
 
-### Prerequisites
+---
 
-Before you begin, ensure you have the following:
+## 🛠️ Tech Stack
+
+- **Frontend**: React.js, Tailwind CSS  
+- **Backend**: Node.js, Express.js, MongoDB  
+- **Queue Management**: Redis  
+- **Build & Deployment**: Docker, Render  
+- **Storage**: AWS S3  
+- **Hosting**: DigitalOcean  
+- **Real-time**: WebSockets  
+- **Authentication & Integration**: GitHub OAuth & GitHub REST APIs  
+
+---
+
+## 📸 Screenshots
+
+### 🖥️ Auth Page  
+![Dashboard]([https://i.postimg.cc/130M7rQy/Screenshot-2025-06-17-005250.png))
+
+### 🖥️ Dashboard View  
+![Dashboard]([https://i.ibb.co/fFHm1RH/dashboard.png](https://i.postimg.cc/130M7rQy/Screenshot-2025-06-17-005250.png))
+
+### ⚙️ Deployment in Progress  
+![Live Logs](https://i.postimg.cc/d0q6bZsr/Screenshot-2025-06-17-005319.png)
+
+### ✅ Fetched Repositories  
+![Success](https://i.postimg.cc/Px7Mv6mQ/Screenshot-2025-06-17-005258.png)
+
+---
+
+## 🎥 Live Demo
+
+Watch DeployRepos in action:  
+[▶️ Live Demo Video](https://drive.google.com/file/d/1heY7Um2HzbqKtPLT8Adv86M2-JlBspPf/view) <!-- Replace with actual working demo URL -->
+
+---
+
+## 🧰 Getting Started
+
+### ✅ Prerequisites
 
 - A GitHub account.
-- The URL of the GitHub repository you want to deploy.
+- A public GitHub repository to deploy.
 
-### Usage
+### 🚀 Usage
 
-1. Visit [DeployRepos.com](https://www.deployrepos.com).
-2. Log in with your GitHub account.
-3. Enter the URL of the GitHub repository you wish to deploy.
+1. Visit [DeployRepos.com](https://deployrepos.vercel.app/)
+2. Log in using your GitHub account.
+3. Choose the repository you want to deploy.
 4. Click the **Deploy** button.
-5. Monitor the live build logs as your repository is being deployed.
-6. Once the deployment is complete, the build logs and deployment will be uploaded to your GitHub repository.
+5. Monitor the **live build logs**.
+6. Once done, the build will be uploaded and deployed to GitHub.
 
-### Example
+---
 
-1. Go to [DeployRepos.com](https://www.deployrepos.com).
-2. Login with your Github Account.
-3. Choose Project to Deploy and Click the **Deploy** button.
-4. Watch the live build logs.
-5. Your Repository is live and hosted :)
+## 🤝 Contributing
 
-## Contributing
+Contributions are welcome!
 
-I welcome contributions to improve DeployRepos.com! To contribute:
-
-1. Fork the repository.
-2. Create a new branch: `git checkout -b feature-branch`.
-3. Make your changes and commit them: `git commit -m 'Add some feature'`.
-4. Push to the branch: `git push origin feature-branch`.
-5. Submit a pull request.
-
-## License
-
-DeployRepos.com is licensed under the MIT License. See the [LICENSE](LICENSE) file for more information.
-
-## Contact
-
-If you have any questions or need support, please contact me at [kavyaguptajpr.24.10@gmail.com](mailto:kavyaguptajpr.24.10@gmail.com).
+1. Fork the repository
+2. Create a new branch: `git checkout -b feature-branch`
+3. Commit your changes: `git commit -m 'Add feature'`
+4. Push to the branch: `git push origin feature-branch`
+5. Open a pull request
