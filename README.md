@@ -33,7 +33,7 @@
 ![Dashboard](https://i.postimg.cc/130M7rQy/Screenshot-2025-06-17-005250.png)
 
 ### 🖥️ Dashboard View  
-![Dashboard]((https://i.postimg.cc/Px7Mv6mQ/Screenshot-2025-06-17-005258.png))
+![Dashboard](https://i.postimg.cc/Px7Mv6mQ/Screenshot-2025-06-17-005258.png)
 
 ### ⚙️ Deployment in Progress  
 ![Live Logs](https://i.postimg.cc/d0q6bZsr/Screenshot-2025-06-17-005319.png)
